@@ -65,7 +65,8 @@ const Activities = ({ date, user, project }) => {
 
   const days = getDaysInMonth(date.getMonth(), date.getFullYear());
   const onAddActivities = (project) => {
-    const found = activities.find((a) => a.projectId === project._id);
+    console.log("pr",project)
+    const found = activities.find((a) => a.projectId === project._id );
     if (found) return toast.error(`Project ${project.name} already added !`);
     setActivities([
       ...activities,
@@ -87,6 +88,7 @@ const Activities = ({ date, user, project }) => {
   };
 
   async function onSave() {
+    console.log(activities)
     for (let i = 0; i < activities.length; i++) {
       await api.post(`/activity`, activities[i]);
       toast.success(`Saved ${activities[i].projectName}`);
@@ -96,8 +98,9 @@ const Activities = ({ date, user, project }) => {
   async function onDelete(i) {
     if (window.confirm("Are you sure ?")) {
       const activity = activities[i];
+      console.log(activity)
       await api.remove(`/activity/${activity._id}`);
-      toast.success(`Deleted ${activity.project}`);
+      toast.success(`Deleted ${activity.projectName}`);
     }
   }
 
@@ -175,7 +178,7 @@ const Activities = ({ date, user, project }) => {
                   </tr>
                   {activities.map((e, i) => {
                     return (
-                      <React.Fragment key={e.project}>
+                      <React.Fragment key={e.projectName}>
                         <tr className="border-t border-b border-r border-[#E5EAEF]" key={`1-${e._id}`} onClick={() => setOpen(i)}>
                           <th className="w-[100px] border-t border-b border-r text-[12px] font-bold text-[#212325] text-left">
                             <div className="flex flex-1 items-center justify-between gap-1 px-2">
@@ -211,7 +214,7 @@ const Activities = ({ date, user, project }) => {
                                 <textarea
                                   value={e.comment}
                                   onChange={(e) => onUpdateComment(i, e.target.value)}
-                                  placeholder={`Please add a comment on what you deliver on ${e.project} (We need to show value created to clients)`}
+                                  placeholder={`Please add a comment on what you deliver on ${e.projectName} (We need to show value created to clients)`}
                                   rows={6}
                                   className="w-full text-sm pt-2 pl-2"
                                 />
@@ -224,7 +227,7 @@ const Activities = ({ date, user, project }) => {
                   })}
                   <tr>
                     <th className="w-[50px] text-[12px] text-[#212325] px-[10px] py-2">
-                      <SelectProject disabled={activities.map((e) => e.project)} value="" onChange={(e) => onAddActivities(e)} />
+                      <SelectProject disabled={activities.map((e) => e.projectId)} value="" onChange={(e) => onAddActivities(e)} />
                     </th>
                   </tr>
                 </tbody>

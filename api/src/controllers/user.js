@@ -5,13 +5,14 @@ const router = express.Router();
 const UserObject = require("../models/user");
 const AuthObject = require("../auth");
 
-const { validatePassword } = require("../utils");
+const { validatePassword, validateEmail } = require("../utils");
 
 const UserAuth = new AuthObject(UserObject);
 
 const SERVER_ERROR = "SERVER_ERROR";
 const USER_ALREADY_REGISTERED = "USER_ALREADY_REGISTERED";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
+const EMAIL_NOT_VALIDATED = "INVALID EMAIL ADDRESS!"
 
 router.post("/signin", (req, res) => UserAuth.signin(req, res));
 router.post("/logout", (req, res) => UserAuth.logout(req, res));
@@ -42,9 +43,11 @@ router.get("/:id", passport.authenticate("user", { session: false }), async (req
 
 router.post("/", passport.authenticate("user", { session: false }), async (req, res) => {
   try {
-    if (!validatePassword(req.body.password)) return res.status(400).send({ ok: false, user: null, code: PASSWORD_NOT_VALIDATED });
-
-    const user = await UserObject.create({ ...req.body, organisation: req.user.organisation });
+    const item = req.body;
+    console.log(item)
+    if (!validateEmail(item.email)) return res.status(400).send({ ok: false, user: null, code: EMAIL_NOT_VALIDATED });
+    if (!validatePassword(item.password)) return res.status(400).send({ ok: false, user: null, code: PASSWORD_NOT_VALIDATED });
+    const user = await UserObject.create({ name: item.username , ...item, organisation: req.user.organisation });
 
     return res.status(200).send({ data: user, ok: true });
   } catch (error) {

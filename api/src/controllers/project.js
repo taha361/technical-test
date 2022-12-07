@@ -29,6 +29,7 @@ router.get("/:id", passport.authenticate("user", { session: false }), async (req
 
 router.post("/", passport.authenticate("user", { session: false }), async (req, res) => {
   try {
+    console.log(req.body)
     const data = await ProjectObject.create({ ...req.body, organisation: req.user.organisation });
     return res.status(200).send({ data, ok: true });
   } catch (error) {
